@@ -4,7 +4,7 @@ public class EnemyAI : MonoBehaviour
 {
     [Header("Detection")]
     [SerializeField] private float detectionRange = 10f;
-    [SerializeField] private float normalAttackRange = 1.8f;
+    [SerializeField] private float attackRange = 1.8f;
     [SerializeField] private float hunterAttackRange = 7f;
 
     [Header("Movement")]
@@ -16,12 +16,18 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float waypointDistance = 0.4f;
     [SerializeField] private float waitAtPoint = 1.5f;
 
+    [Header("Retreat")]
+    [SerializeField] private int retreatHealthThreshold = 25;
+    [SerializeField] private float retreatDistance = 8f;
+    [SerializeField] private float retreatSpeedMultiplier = 1.3f;
+
     [Header("Attack")]
     [SerializeField] private int defaultDamage = 15;
     [SerializeField] private float attackCooldown = 1.5f;
 
     private Transform player;
     private EnemyArchetype archetype;
+    private EnemyHealth enemyHealth;
 
     private int currentWaypoint;
     private float nextAttackTime;
@@ -31,6 +37,7 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         archetype = GetComponent<EnemyArchetype>();
+        enemyHealth = GetComponent<EnemyHealth>();
     }
 
     private void Start()
@@ -70,20 +77,40 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        LookAtPlayer();
-
-        float attackRange = normalAttackRange;
-
-        if (archetype != null &&
-            archetype.Type == EnemyArchetype.EnemyType.Hunter)
+        if (ShouldRetreat() &&
+            GetEnemyType() != EnemyArchetype.EnemyType.Heavy)
         {
-            attackRange = hunterAttackRange;
+            RetreatFromPlayer(distance);
+            return;
         }
 
-        if (distance > attackRange)
+        LookAtPlayer();
+
+        float range = GetEnemyType() ==
+            EnemyArchetype.EnemyType.Hunter
+            ? hunterAttackRange
+            : attackRange;
+
+        if (distance > range)
             ChasePlayer();
         else
             AttackPlayer(health);
+    }
+
+    private EnemyArchetype.EnemyType GetEnemyType()
+    {
+        return archetype != null
+            ? archetype.Type
+            : EnemyArchetype.EnemyType.Scout;
+    }
+
+    private bool ShouldRetreat()
+    {
+        if (enemyHealth == null)
+            return false;
+
+        return enemyHealth.CurrentHealth <=
+               retreatHealthThreshold;
     }
 
     private float GetMoveSpeed()
@@ -149,15 +176,41 @@ public class EnemyAI : MonoBehaviour
 
         direction.y = 0f;
 
+        RotateTowards(direction);
+
+        Vector3 targetPosition = new Vector3(
+            player.position.x,
+            transform.position.y,
+            player.position.z
+        );
+
         transform.position = Vector3.MoveTowards(
             transform.position,
-            new Vector3(
-                player.position.x,
-                transform.position.y,
-                player.position.z
-            ),
+            targetPosition,
             GetMoveSpeed() * Time.deltaTime
         );
+    }
+
+    private void RetreatFromPlayer(float distance)
+    {
+        Vector3 direction =
+            transform.position - player.position;
+
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.01f)
+            direction = -transform.forward;
+
+        RotateTowards(direction);
+
+        if (distance >= retreatDistance)
+            return;
+
+        transform.position +=
+            direction.normalized *
+            GetMoveSpeed() *
+            retreatSpeedMultiplier *
+            Time.deltaTime;
     }
 
     private void LookAtPlayer()
@@ -198,7 +251,5 @@ public class EnemyAI : MonoBehaviour
 
         nextAttackTime =
             Time.time + attackCooldown;
-
-        Debug.Log("AXIOM: Противник атаковал игрока!");
     }
 }
