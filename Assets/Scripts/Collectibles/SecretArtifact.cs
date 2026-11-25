@@ -42,7 +42,10 @@ public class SecretArtifact : MonoBehaviour
         collected = true;
 
         PlayerPrefs.SetInt(GetSaveKey(), 1);
+        PlayerPrefs.SetInt("AXIOM_ARTIFACT_FIRST", 1);
+        PlayerPrefs.SetInt("AXIOM_HAS_ANY_ARTIFACT", 1);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
 
         Debug.Log("Найден артефакт: " + artifactName);
 
