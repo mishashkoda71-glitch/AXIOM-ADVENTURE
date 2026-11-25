@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
@@ -9,6 +8,12 @@ public class EnemyHealth : MonoBehaviour
     [Header("Death")]
     [SerializeField] private GameObject deathEffect;
     [SerializeField] private float destroyDelay = 0.2f;
+
+    [Header("Rewards")]
+    [SerializeField] private GameObject rewardPrefab;
+    [Range(0f, 1f)]
+    [SerializeField] private float rewardDropChance = 0.7f;
+    [SerializeField] private float rewardHeight = 0.5f;
 
     public int CurrentHealth { get; private set; }
 
@@ -52,6 +57,28 @@ public class EnemyHealth : MonoBehaviour
             );
         }
 
+        DropReward();
+
         Destroy(gameObject, destroyDelay);
+    }
+
+    private void DropReward()
+    {
+        if (rewardPrefab == null)
+            return;
+
+        if (Random.value > rewardDropChance)
+            return;
+
+        Vector3 dropPosition =
+            transform.position + Vector3.up * rewardHeight;
+
+        Instantiate(
+            rewardPrefab,
+            dropPosition,
+            Quaternion.identity
+        );
+
+        Debug.Log("AXIOM: Противник оставил награду!");
     }
 }
