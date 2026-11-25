@@ -39,6 +39,7 @@ public class LevelManager : MonoBehaviour
         {
             PlayerPrefs.SetInt(UnlockedKey, nextLevel);
             PlayerPrefs.Save();
+            GameSaveSystem.SaveGame();
         }
 
         if (CurrentLevel < TotalLevels)
@@ -66,5 +67,6 @@ public class LevelManager : MonoBehaviour
     {
         PlayerPrefs.DeleteKey(UnlockedKey);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
     }
 }
