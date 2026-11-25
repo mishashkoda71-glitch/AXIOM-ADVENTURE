@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    name: Build AXIOM-ADVENTURE APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Build Android APK with Unity
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          projectPath: .
+          unityVersion: 2022.3.62f1
+          targetPlatform: Android
+          buildsPath: build
+          buildName: AXIOM-ADVENTURE
+          androidAppBundle: false
+          allowDirtyBuild: true
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AXIOM-ADVENTURE-Android-APK
+          path: build/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
