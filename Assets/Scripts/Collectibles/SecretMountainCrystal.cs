@@ -54,6 +54,7 @@ public class SecretMountainCrystal : MonoBehaviour
 
         PlayerPrefs.SetInt(CrystalFoundKey, 1);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
 
         SceneManager.LoadScene(secretLevelName);
     }
