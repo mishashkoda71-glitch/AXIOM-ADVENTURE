@@ -19,6 +19,9 @@ public class SecretMountainKey : MonoBehaviour
     private void Start()
     {
         startPosition = transform.position;
+
+        if (HasKey)
+            gameObject.SetActive(false);
     }
 
     private void Update()
@@ -39,6 +42,7 @@ public class SecretMountainKey : MonoBehaviour
 
         PlayerPrefs.SetInt(KeyFound, 1);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
 
         Debug.Log("Вы открыли секретную гору!");
 
