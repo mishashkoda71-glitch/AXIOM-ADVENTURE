@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -20f;
 
+    [Header("Mobile Controls")]
+    [SerializeField] private MobileJoystick movementJoystick;
+
     [Header("Camera")]
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private float mouseSensitivity = 2f;
@@ -37,12 +40,22 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        Vector2 input = Vector2.zero;
+
+        if (movementJoystick != null &&
+            movementJoystick.Direction.sqrMagnitude > 0.01f)
+        {
+            input = movementJoystick.Direction;
+        }
+        else
+        {
+            input.x = Input.GetAxis("Horizontal");
+            input.y = Input.GetAxis("Vertical");
+        }
 
         Vector3 direction =
-            transform.right * horizontal +
-            transform.forward * vertical;
+            transform.right * input.x +
+            transform.forward * input.y;
 
         direction = Vector3.ClampMagnitude(direction, 1f);
 
@@ -64,7 +77,6 @@ public class PlayerController : MonoBehaviour
         }
 
         velocity.y += gravity * Time.deltaTime;
-
         controller.Move(velocity * Time.deltaTime);
     }
 
