@@ -44,6 +44,12 @@ public class GameSaveSystem : MonoBehaviour
         Debug.Log("AXIOM: Прогресс сохранён!");
     }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void LoadBeforeFirstScene()
+    {
+        LoadGame();
+    }
+
     public static void LoadGame()
     {
         if (!PlayerPrefs.HasKey(SaveKey))
