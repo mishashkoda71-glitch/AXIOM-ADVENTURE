@@ -71,13 +71,14 @@ public class PlayerController : MonoBehaviour
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
-        bool mobileJump = JumpButton.JumpPressed;
+        // Mobile taps are consumed immediately, so tapping in mid-air
+        // cannot trigger an unintended jump after landing.
+        bool mobileJump = JumpButton.ConsumeJumpRequest();
         bool keyboardJump = Input.GetButtonDown("Jump");
 
         if (controller.isGrounded && (mobileJump || keyboardJump))
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            JumpButton.ResetJump();
         }
 
         velocity.y += gravity * Time.deltaTime;
