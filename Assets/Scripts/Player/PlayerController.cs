@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Mobile Controls")]
     [SerializeField] private MobileJoystick movementJoystick;
+    [SerializeField] private MobileCameraLook cameraLook;
 
     [Header("Camera")]
     [SerializeField] private Transform cameraTransform;
@@ -89,6 +91,13 @@ public class PlayerController : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        if (cameraLook != null)
+        {
+            mouseX += cameraLook.LookDelta.x;
+            mouseY += cameraLook.LookDelta.y;
+            cameraLook.ResetDelta();
+        }
 
         transform.Rotate(Vector3.up * mouseX);
 
