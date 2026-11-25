@@ -115,6 +115,7 @@ public class AchievementManager : MonoBehaviour
     private bool HasAnyArtifact()
     {
         return PlayerPrefs.GetInt(
-            "AXIOM_ARTIFACT_FIRST", 0) == 1;
+            "AXIOM_HAS_ANY_ARTIFACT",
+            PlayerPrefs.GetInt("AXIOM_ARTIFACT_FIRST", 0)) == 1;
     }
 }
