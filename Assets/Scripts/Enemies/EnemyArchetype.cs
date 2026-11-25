@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class EnemyArchetype : MonoBehaviour
@@ -28,6 +27,7 @@ public class EnemyArchetype : MonoBehaviour
     [SerializeField] private float hunterSpeed = 2.5f;
     [SerializeField] private int hunterDamage = 20;
 
+    public EnemyType Type => enemyType;
     public int Health { get; private set; }
     public float Speed { get; private set; }
     public int Damage { get; private set; }
