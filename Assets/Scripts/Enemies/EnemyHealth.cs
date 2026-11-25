@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [Header("Enemy Health")]
+    [Header("Default Health")]
     [SerializeField] private int maxHealth = 100;
 
     [Header("Death")]
@@ -11,16 +11,25 @@ public class EnemyHealth : MonoBehaviour
 
     [Header("Rewards")]
     [SerializeField] private GameObject rewardPrefab;
+
     [Range(0f, 1f)]
     [SerializeField] private float rewardDropChance = 0.7f;
+
     [SerializeField] private float rewardHeight = 0.5f;
 
     public int CurrentHealth { get; private set; }
 
     private bool isDead;
 
-    private void Awake()
+    private void Start()
     {
+        EnemyArchetype archetype =
+            GetComponent<EnemyArchetype>();
+
+        if (archetype != null)
+            maxHealth = archetype.Health;
+
+        maxHealth = Mathf.Max(1, maxHealth);
         CurrentHealth = maxHealth;
     }
 
@@ -29,10 +38,14 @@ public class EnemyHealth : MonoBehaviour
         if (isDead || damage <= 0)
             return;
 
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        CurrentHealth = Mathf.Max(
+            0,
+            CurrentHealth - damage
+        );
 
         Debug.Log(
-            "AXIOM: Здоровье противника: " + CurrentHealth
+            "AXIOM: Здоровье противника: " +
+            CurrentHealth + "/" + maxHealth
         );
 
         if (CurrentHealth <= 0)
@@ -70,15 +83,16 @@ public class EnemyHealth : MonoBehaviour
         if (Random.value > rewardDropChance)
             return;
 
-        Vector3 dropPosition =
-            transform.position + Vector3.up * rewardHeight;
+        Vector3 position =
+            transform.position +
+            Vector3.up * rewardHeight;
 
         Instantiate(
             rewardPrefab,
-            dropPosition,
+            position,
             Quaternion.identity
         );
 
-        Debug.Log("AXIOM: Противник оставил награду!");
+        Debug.Log("AXIOM: Выпала награда!");
     }
 }
