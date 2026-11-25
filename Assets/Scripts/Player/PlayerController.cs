@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -70,10 +69,13 @@ public class PlayerController : MonoBehaviour
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
-        if (controller.isGrounded &&
-            Input.GetButtonDown("Jump"))
+        bool mobileJump = JumpButton.JumpPressed;
+        bool keyboardJump = Input.GetButtonDown("Jump");
+
+        if (controller.isGrounded && (mobileJump || keyboardJump))
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            JumpButton.ResetJump();
         }
 
         velocity.y += gravity * Time.deltaTime;
