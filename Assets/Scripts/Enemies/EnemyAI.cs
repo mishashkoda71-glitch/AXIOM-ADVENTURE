@@ -1,22 +1,28 @@
-
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
     [Header("Detection")]
     [SerializeField] private float detectionRange = 10f;
-    [SerializeField] private float attackRange = 1.8f;
+    [SerializeField] private float normalAttackRange = 1.8f;
+    [SerializeField] private float hunterAttackRange = 7f;
 
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float defaultMoveSpeed = 3f;
     [SerializeField] private float rotationSpeed = 6f;
 
     [Header("Attack")]
-    [SerializeField] private int damage = 15;
+    [SerializeField] private int defaultDamage = 15;
     [SerializeField] private float attackCooldown = 1.5f;
 
     private Transform player;
+    private EnemyArchetype archetype;
     private float nextAttackTime;
+
+    private void Awake()
+    {
+        archetype = GetComponent<EnemyArchetype>();
+    }
 
     private void Start()
     {
@@ -32,7 +38,8 @@ public class EnemyAI : MonoBehaviour
         if (player == null)
             return;
 
-        PlayerHealth health = player.GetComponent<PlayerHealth>();
+        PlayerHealth health =
+            player.GetComponent<PlayerHealth>();
 
         if (health == null || health.IsDead)
             return;
@@ -47,6 +54,14 @@ public class EnemyAI : MonoBehaviour
 
         LookAtPlayer();
 
+        float attackRange = normalAttackRange;
+
+        if (archetype != null &&
+            archetype.Type == EnemyArchetype.EnemyType.Hunter)
+        {
+            attackRange = hunterAttackRange;
+        }
+
         if (distance > attackRange)
         {
             ChasePlayer();
@@ -59,7 +74,9 @@ public class EnemyAI : MonoBehaviour
 
     private void LookAtPlayer()
     {
-        Vector3 direction = player.position - transform.position;
+        Vector3 direction =
+            player.position - transform.position;
+
         direction.y = 0f;
 
         if (direction.sqrMagnitude < 0.01f)
@@ -77,13 +94,18 @@ public class EnemyAI : MonoBehaviour
 
     private void ChasePlayer()
     {
+        float speed = defaultMoveSpeed;
+
+        if (archetype != null)
+            speed = archetype.Speed;
+
         Vector3 targetPosition = player.position;
         targetPosition.y = transform.position.y;
 
         transform.position = Vector3.MoveTowards(
             transform.position,
             targetPosition,
-            moveSpeed * Time.deltaTime
+            speed * Time.deltaTime
         );
     }
 
@@ -92,18 +114,15 @@ public class EnemyAI : MonoBehaviour
         if (Time.time < nextAttackTime)
             return;
 
+        int damage = defaultDamage;
+
+        if (archetype != null)
+            damage = archetype.Damage;
+
         health.TakeDamage(damage);
+
         nextAttackTime = Time.time + attackCooldown;
 
         Debug.Log("AXIOM: Противник атаковал игрока!");
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRange);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
