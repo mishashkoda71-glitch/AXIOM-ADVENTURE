@@ -24,6 +24,7 @@ public class SecretTrialExit : MonoBehaviour
 
         PlayerPrefs.SetInt(WorldUnlockedKey, 1);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
 
         Debug.Log("Секретное испытание пройдено!");
         Debug.Log("Открыт AXIOM SECRET WORLD!");
