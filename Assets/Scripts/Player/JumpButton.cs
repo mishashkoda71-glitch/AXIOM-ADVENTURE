@@ -3,15 +3,22 @@ using UnityEngine.EventSystems;
 
 public class JumpButton : MonoBehaviour, IPointerDownHandler
 {
-    public static bool JumpPressed { get; private set; }
+    private static bool jumpRequested;
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        JumpPressed = true;
+        jumpRequested = true;
+    }
+
+    public static bool ConsumeJumpRequest()
+    {
+        bool requested = jumpRequested;
+        jumpRequested = false;
+        return requested;
     }
 
     public static void ResetJump()
     {
-        JumpPressed = false;
+        jumpRequested = false;
     }
 }
