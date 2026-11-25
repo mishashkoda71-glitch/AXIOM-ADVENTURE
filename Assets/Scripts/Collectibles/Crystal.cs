@@ -52,6 +52,7 @@ public static class CrystalInventory
 
         PlayerPrefs.SetInt(CrystalKey, Amount + amount);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
 
         Debug.Log("Crystals collected: " + Amount);
     }
@@ -60,5 +61,6 @@ public static class CrystalInventory
     {
         PlayerPrefs.DeleteKey(CrystalKey);
         PlayerPrefs.Save();
+        GameSaveSystem.SaveGame();
     }
 }
