@@ -31,6 +31,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Verify core gameplay rules
+        run: dotnet run --project AxiomNext/src/AxiomNext.Core.Tests/AxiomNext.Core.Tests.csproj --configuration Release
+
       - name: Install native libraries required by Stride asset compiler
         run: |
           sudo apt-get update
