@@ -50,5 +50,14 @@ Check(game.DamagePlayer(10) == 0, "paused game ignores damage");
 game.Resume();
 Check(game.DamagePlayer(200) == 100 && game.Player.Health == 0, "health cannot drop below zero");
 Check(game.HealPlayer(10) == 0, "defeated player cannot heal");
+var respawnPoint = game.Respawn();
+Check(respawnPoint?.LevelId == "Level_01" && game.Player.Health == 100, "player respawns at checkpoint with full health");
+
+var scout = SlimeEnemy.CreateScout("scout-01");
+var heavy = SlimeEnemy.CreateHeavy("heavy-01");
+var hunter = SlimeEnemy.CreateHunter("hunter-01");
+Check(scout.Archetype == SlimeArchetype.Scout && scout.MoveSpeed > heavy.MoveSpeed, "scout is fast and light");
+Check(heavy.MaxHealth > scout.MaxHealth && heavy.ContactDamage > scout.ContactDamage, "heavy is durable and strong");
+Check(hunter.AttackRange > scout.AttackRange, "hunter attacks from range");
 
 Console.WriteLine("All AxiomNext.Core checks passed.");
