@@ -38,6 +38,10 @@ public static class AxiomProjectSetup
         }
 
         EditorBuildSettings.scenes = buildScenes.ToArray();
+        PlayerSettings.companyName = "AXIOM Studio";
+        PlayerSettings.productName = "AXIOM-ADVENTURE";
+        PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
+        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
         AssetDatabase.SaveAssets();
         Debug.Log("AXIOM: 40 level scenes and Android build list are ready.");
     }
