@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: axiom-next-android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-android:
     name: Generate Stride project and build Android APK
