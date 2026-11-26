@@ -21,6 +21,7 @@ jobs:
           projectPath: .
           unityVersion: 2022.3.62f1
           targetPlatform: Android
+          buildMethod: AxiomBuild.PerformAndroidBuild
           buildsPath: build
           buildName: AXIOM-ADVENTURE
           androidAppBundle: false
