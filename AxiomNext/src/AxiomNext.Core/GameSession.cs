@@ -106,6 +106,14 @@ public sealed class GameSession
 
     public bool CompleteLevel(int level) => Progress.Complete(level);
 
+    public CheckpointData? Respawn()
+    {
+        if (Player.Health > 0) return null;
+        Player.Health = Player.MaxHealth;
+        IsPaused = false;
+        return Checkpoint;
+    }
+
     public SaveGameData CreateSaveData() => new()
     {
         PlayerName = Player.Name,
