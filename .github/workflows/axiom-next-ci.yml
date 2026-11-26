@@ -84,7 +84,7 @@ jobs:
             find AxiomNext/StrideProject -maxdepth 5 -type f
             exit 1
           fi
-          dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk -p:StrideCompileAssets=false --verbosity normal
+          dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk -p:StrideCompilerSkipBuild=true --verbosity normal
 
       - name: Archive Stride source when Android build fails
         if: failure()
