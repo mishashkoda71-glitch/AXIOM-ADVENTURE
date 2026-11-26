@@ -1,4 +1,4 @@
-name: AXIOM NEXT - C# validation
+name: AXIOM NEXT - Stride Android
 
 on:
   workflow_dispatch:
@@ -11,20 +11,59 @@ permissions:
   contents: read
 
 jobs:
-  build-core:
-    name: Build C# game core
+  build-android:
+    name: Generate Stride project and build Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install .NET 8
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
-      - name: Restore
-        run: dotnet restore AxiomNext/src/AxiomNext.Core/AxiomNext.Core.csproj
+      - name: Install Android workload
+        run: dotnet workload install android
 
-      - name: Build
-        run: dotnet build AxiomNext/src/AxiomNext.Core/AxiomNext.Core.csproj --configuration Release --no-restore
+      - name: Install Stride game template
+        run: dotnet new install Stride.Templates.Games@4.4.1
+
+      - name: Generate Stride Android project
+        run: dotnet new stride-game -n AxiomNext --platforms android --orientation LandscapeLeft
+
+      - name: Connect shared C# game logic
+        shell: bash
+        run: |
+          GAME_PROJECT="$(find AxiomNext -name '*.Game.csproj' -print -quit)"
+          if [ -z "$GAME_PROJECT" ]; then
+            echo "Stride game project was not generated."
+            find AxiomNext -maxdepth 3 -type f
+            exit 1
+          fi
+          dotnet add "$GAME_PROJECT" reference "$GITHUB_WORKSPACE/AxiomNext/src/AxiomNext.Core/AxiomNext.Core.csproj"
+
+      - name: Restore and publish Android APK
+        shell: bash
+        run: |
+          ANDROID_PROJECT="$(find AxiomNext -name '*.Android.csproj' -print -quit)"
+          if [ -z "$ANDROID_PROJECT" ]; then
+            echo "Stride Android project was not generated."
+            find AxiomNext -maxdepth 4 -type f
+            exit 1
+          fi
+          dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AXIOM-ADVENTURE-Stride-Android-APK
+          path: AxiomNext/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
