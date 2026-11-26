@@ -1,0 +1,47 @@
+apply plugin: 'com.android.application'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    **DEPS**
+}
+
+android {
+    namespace "**NAMESPACE**"
+    ndkPath "**NDKPATH**"
+    compileSdk **APIVERSION**
+    buildToolsVersion "**BUILDTOOLS**"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdk **MINSDK**
+        targetSdk **TARGETSDK**
+        applicationId '**APPLICATIONID**'
+        ndk {
+            abiFilters **ABIFILTERS**
+        }
+        versionCode **VERSIONCODE**
+        versionName '**VERSIONNAME**'
+        multiDexEnabled **MULTIDEX**
+    }
+
+    lint {
+        abortOnError false
+    }
+
+    aaptOptions {
+        noCompress = **BUILTIN_NOCOMPRESS** + unityStreamingAssets.tokenize(', ')
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
+
+    packagingOptions {
+        doNotStrip **DO_NOT_STRIP**
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+    **PACKAGING**
+}
