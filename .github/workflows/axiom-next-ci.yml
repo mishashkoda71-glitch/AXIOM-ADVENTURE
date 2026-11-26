@@ -84,7 +84,19 @@ jobs:
             find AxiomNext/StrideProject -maxdepth 5 -type f
             exit 1
           fi
-          dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk --verbosity normal
+          dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk -p:StrideCompileAssets=false --verbosity normal
+
+      - name: Archive Stride source when Android build fails
+        if: failure()
+        run: tar -czf /tmp/StrideProject-source.tar.gz --exclude='*/bin/*' --exclude='*/obj/*' AxiomNext/StrideProject
+
+      - name: Upload Stride source diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AXIOM-ADVENTURE-Stride-source-diagnostics
+          path: /tmp/StrideProject-source.tar.gz
+          retention-days: 7
 
       - name: Save generated Stride project to GitHub
         if: success()
