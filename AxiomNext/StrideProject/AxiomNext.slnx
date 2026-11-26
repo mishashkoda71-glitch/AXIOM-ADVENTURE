@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AxiomNext.Game/AxiomNext.Game.csproj" />
+  <Project Path="AxiomNext.Linux/AxiomNext.Linux.csproj" DefaultStartup="true" />
+  <Project Path="AxiomNext.Android/AxiomNext.Android.csproj" />
+</Solution>

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AxiomNext.Android</RootNamespace>
+    <OutputPath>..\Bin\Android\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ApplicationId>AxiomNext</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <!-- Use AssemblyName for Resource class to avoid clashes between AxiomNext and AxiomNext.Android -->
+    <AndroidResgenNamespace>$(AssemblyName)</AndroidResgenNamespace>
+    <StrideCurrentPackagePath>$(MSBuildThisFileDirectory)..\AxiomNext.Game\AxiomNext.Game.sdpkg</StrideCurrentPackagePath>
+    <StridePlatform>Android</StridePlatform>
+    <AndroidApplicationIcon>@mipmap/appicon</AndroidApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AxiomNext.Game\AxiomNext.Game.csproj" />
+  </ItemGroup>
+</Project>
