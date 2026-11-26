@@ -43,7 +43,11 @@ public static class AxiomProjectSetup
         PlayerSettings.productName = "AXIOM-ADVENTURE";
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
-        PlayerSettings.Android.useCustomMainGradleTemplate = true;
+
+        // Use Unity 6.6's generated Gradle templates. The legacy custom template
+        // was created for the older 2022.3 project and is intentionally disabled.
+        PlayerSettings.Android.useCustomMainGradleTemplate = false;
+
         AssetDatabase.SaveAssets();
         Debug.Log("AXIOM: 40 level scenes and Android build list are ready.");
     }
