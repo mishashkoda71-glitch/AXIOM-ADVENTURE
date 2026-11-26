@@ -22,8 +22,13 @@ public sealed class GameSession
     {
         SetHealth(save.Health);
         Player.AddCoins(save.Coins);
-        foreach (var crystalId in save.CollectedCrystals.Where(x => !string.IsNullOrWhiteSpace(x)))
-            Player.CollectedCrystals.Add(crystalId);
+        foreach (var id in save.CollectedCrystals.Where(x => !string.IsNullOrWhiteSpace(x)))
+            Player.CollectedCrystals.Add(id);
+        foreach (var id in save.CollectedArtifacts.Where(x => !string.IsNullOrWhiteSpace(x)))
+            CollectedArtifacts.Add(id);
+        SecretWorldUnlocked = save.SecretWorldUnlocked;
+        Checkpoint = save.Checkpoint;
+
         foreach (var level in save.CompletedLevels.Distinct().Order())
             if (Progress.IsUnlocked(level)) Progress.Complete(level);
         while (Progress.HighestUnlockedLevel < Math.Clamp(save.HighestUnlockedLevel, 1, CampaignLevelCount))
@@ -34,6 +39,9 @@ public sealed class GameSession
     public LevelProgress Progress { get; }
     public bool IsPaused { get; private set; }
     public int DefeatedEnemyCount { get; private set; }
+    public bool SecretWorldUnlocked { get; private set; }
+    public CheckpointData? Checkpoint { get; private set; }
+    public HashSet<string> CollectedArtifacts { get; } = new(StringComparer.Ordinal);
 
     public void Pause() => IsPaused = true;
     public void Resume() => IsPaused = false;
@@ -65,6 +73,26 @@ public sealed class GameSession
         return Player.CollectedCrystals.Add(crystalId);
     }
 
+    public bool CollectArtifact(string artifactId)
+    {
+        if (string.IsNullOrWhiteSpace(artifactId)) return false;
+        return CollectedArtifacts.Add(artifactId);
+    }
+
+    public bool UnlockSecretWorld()
+    {
+        if (SecretWorldUnlocked) return false;
+        SecretWorldUnlocked = true;
+        return true;
+    }
+
+    public bool ActivateCheckpoint(string levelId, float x, float y, float z)
+    {
+        if (string.IsNullOrWhiteSpace(levelId)) return false;
+        Checkpoint = new CheckpointData(levelId, x, y, z);
+        return true;
+    }
+
     public bool AttackEnemy(SlimeEnemy enemy, int damage)
     {
         ArgumentNullException.ThrowIfNull(enemy);
@@ -85,7 +113,10 @@ public sealed class GameSession
         Coins = Player.Coins,
         HighestUnlockedLevel = Progress.HighestUnlockedLevel,
         CompletedLevels = Enumerable.Range(1, Progress.LevelCount).Where(Progress.IsCompleted).ToList(),
-        CollectedCrystals = Player.CollectedCrystals.Order(StringComparer.Ordinal).ToList()
+        CollectedCrystals = Player.CollectedCrystals.Order(StringComparer.Ordinal).ToList(),
+        CollectedArtifacts = CollectedArtifacts.Order(StringComparer.Ordinal).ToList(),
+        SecretWorldUnlocked = SecretWorldUnlocked,
+        Checkpoint = Checkpoint
     };
 
     public static GameSession Restore(SaveGameData save)
