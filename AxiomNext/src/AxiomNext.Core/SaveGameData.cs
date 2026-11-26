@@ -14,6 +14,9 @@ public sealed record SaveGameData
     public int HighestUnlockedLevel { get; init; } = 1;
     public List<int> CompletedLevels { get; init; } = [];
     public List<string> CollectedCrystals { get; init; } = [];
+    public List<string> CollectedArtifacts { get; init; } = [];
+    public bool SecretWorldUnlocked { get; init; }
+    public CheckpointData? Checkpoint { get; init; }
 
     public string ToJson() => JsonSerializer.Serialize(this, JsonOptions);
 
