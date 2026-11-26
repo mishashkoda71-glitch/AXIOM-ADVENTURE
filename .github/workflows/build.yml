@@ -22,9 +22,9 @@ jobs:
           unityVersion: 2022.3.62f1
           targetPlatform: Android
           buildMethod: AxiomBuild.PerformAndroidBuild
+          androidExportType: androidPackage
           buildsPath: build
           buildName: AXIOM-ADVENTURE
-          androidAppBundle: false
           allowDirtyBuild: true
 
       - name: Upload APK
