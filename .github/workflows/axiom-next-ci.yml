@@ -6,9 +6,10 @@ on:
     paths:
       - 'AxiomNext/**'
       - '.github/workflows/axiom-next-ci.yml'
+      - '.gitignore'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: axiom-next-android-${{ github.ref }}
@@ -16,7 +17,7 @@ concurrency:
 
 jobs:
   build-android:
-    name: Generate Stride project and build Android APK
+    name: Verify gameplay and build Stride Android APK
     runs-on: ubuntu-latest
     env:
       DOTNET_NUGET_SIGNATURE_VERIFICATION: 'false'
@@ -49,35 +50,60 @@ jobs:
       - name: Install Stride game template
         run: dotnet new install Stride.Templates.Games@4.4.1
 
-      - name: Generate Stride Android project
-        run: dotnet new stride-game -n AxiomNext --platforms android --orientation LandscapeLeft
+      - name: Generate Stride Android project if it does not exist yet
+        shell: bash
+        run: |
+          mkdir -p AxiomNext/StrideProject
+          if find AxiomNext/StrideProject -name '*.Android.csproj' -print -quit | grep -q .; then
+            echo "Using the Stride project already stored in the repository."
+          else
+            dotnet new stride-game -n AxiomNext --output AxiomNext/StrideProject --platforms android --orientation LandscapeLeft
+          fi
 
       - name: Connect shared C# game logic
         shell: bash
         run: |
-          GAME_PROJECT="$(find AxiomNext -name '*.Game.csproj' -print -quit)"
+          GAME_PROJECT="$(find AxiomNext/StrideProject -name '*.Game.csproj' -print -quit)"
           if [ -z "$GAME_PROJECT" ]; then
-            echo "Stride game project was not generated."
-            find AxiomNext -maxdepth 3 -type f
+            echo "Stride game project was not found."
+            find AxiomNext/StrideProject -maxdepth 4 -type f
             exit 1
           fi
-          dotnet add "$GAME_PROJECT" reference "$GITHUB_WORKSPACE/AxiomNext/src/AxiomNext.Core/AxiomNext.Core.csproj"
+          if ! grep -q 'AxiomNext.Core.csproj' "$GAME_PROJECT"; then
+            CORE_PROJECT="$GITHUB_WORKSPACE/AxiomNext/src/AxiomNext.Core/AxiomNext.Core.csproj"
+            RELATIVE_CORE="$(realpath --relative-to="$(dirname "$GAME_PROJECT")" "$CORE_PROJECT")"
+            (cd "$(dirname "$GAME_PROJECT")" && dotnet add "$(basename "$GAME_PROJECT")" reference "$RELATIVE_CORE")
+          fi
 
       - name: Restore and publish Android APK
         shell: bash
         run: |
-          ANDROID_PROJECT="$(find AxiomNext -name '*.Android.csproj' -print -quit)"
+          ANDROID_PROJECT="$(find AxiomNext/StrideProject -name '*.Android.csproj' -print -quit)"
           if [ -z "$ANDROID_PROJECT" ]; then
-            echo "Stride Android project was not generated."
-            find AxiomNext -maxdepth 4 -type f
+            echo "Stride Android project was not found."
+            find AxiomNext/StrideProject -maxdepth 5 -type f
             exit 1
           fi
           dotnet publish "$ANDROID_PROJECT" --configuration Release -p:AndroidPackageFormat=apk --verbosity normal
+
+      - name: Save generated Stride project to GitHub
+        if: success()
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain AxiomNext/StrideProject)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add AxiomNext/StrideProject
+            git commit -m "Add generated Stride Android project"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          else
+            echo "Stride project is already up to date."
+          fi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AXIOM-ADVENTURE-Stride-Android-APK
-          path: AxiomNext/**/*.apk
+          path: AxiomNext/StrideProject/**/*.apk
           if-no-files-found: error
           retention-days: 14
