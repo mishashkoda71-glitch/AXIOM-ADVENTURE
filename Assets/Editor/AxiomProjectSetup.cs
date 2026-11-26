@@ -42,6 +42,7 @@ public static class AxiomProjectSetup
         PlayerSettings.productName = "AXIOM-ADVENTURE";
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+        PlayerSettings.Android.useCustomMainGradleTemplate = true;
         AssetDatabase.SaveAssets();
         Debug.Log("AXIOM: 40 level scenes and Android build list are ready.");
     }
